@@ -59,6 +59,7 @@
                 clearable
                 :dense="$q.screen.xs || $q.screen.sm"
                 :func-load-data="getCities"
+                :store="citiesStore"
                 :options="cities"
               />
               <q-btn
@@ -181,6 +182,7 @@ export default {
   },
   data() {
     return {
+      citiesStore,
       city: null,
       options: null,
       show: false,

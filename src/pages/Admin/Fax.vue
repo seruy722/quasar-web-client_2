@@ -880,14 +880,14 @@ export default {
           this.$q.loading.hide();
           this.showNotif("success", "Запись успешно обновлена.");
         })
-        .catch((errors) => {
+        .catch(() => {
           this.$q.loading.hide();
         });
     },
     addToAddSaveArray(val, key) {
-      const findIndex = findIndex(this.addToSaveArray, { id: val.id });
-      if (findIndex !== -1) {
-        this.addToSaveArray[findIndex][key] = val[key];
+      const findIndexElm = findIndex(this.addToSaveArray, { id: val.id });
+      if (findIndexElm !== -1) {
+        this.addToSaveArray[findIndexElm][key] = val[key];
       } else {
         const newObj = assign(
           {},

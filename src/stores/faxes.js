@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { getUrl } from "src/tools/url";
 import { axiosInstance } from "boot/axios";
 import { setFormatedDate } from "src/utils/FrequentlyCalledFunctions";
+import { findIndex } from "lodash";
 
 export const useFaxesStore = defineStore("faxes", {
   state: () => ({

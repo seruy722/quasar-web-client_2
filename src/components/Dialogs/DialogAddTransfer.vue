@@ -69,6 +69,7 @@
             :label="item.label"
             :field="item.field"
             :func-load-data="item.funcLoadData"
+            :store="item.store"
             :errors="errorsData"
             @change="changeValueFunc"
           />

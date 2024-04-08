@@ -333,6 +333,7 @@ export default defineComponent({
         options: [],
         changeValue: false,
         funcLoadData: getClientCodes,
+        store: codesStore,
         default: null,
         value: null,
       },
