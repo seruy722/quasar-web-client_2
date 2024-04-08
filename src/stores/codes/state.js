@@ -1,0 +1,4 @@
+export default {
+  codes: [],
+  codesWithCustomers: [],
+};

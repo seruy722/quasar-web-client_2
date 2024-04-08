@@ -1,0 +1,220 @@
+<template>
+  <DialogComponent
+    v-model:dialog="show"
+    title="Клиент"
+    :persistent="true"
+    data-vue-component-name="DialogAddDocuments"
+  >
+    <q-card style="min-width: 320px; width: 100%; max-width: 500px">
+      <q-card-section class="row justify-between bg-grey q-mb-sm">
+        <span class="text-h6">Добавление комментария</span>
+        <IconBtn
+          dense
+          icon="clear"
+          tooltip="Закрыть"
+          color="negative"
+          @icon-btn-click="close(files)"
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-list separator bordered>
+          <q-item v-for="(file, index) in files" :key="index" clickable>
+            <q-item-section>
+              <q-avatar
+                v-if="extensions.includes(getFileExt(file))"
+                rounded
+                color="primary"
+                text-color="white"
+              >
+                {{ getFileExt(file) }}
+              </q-avatar>
+              <q-img v-else :src="file.url" style="max-width: 100%" />
+            </q-item-section>
+            <q-item-section v-if="extensions.includes(getFileExt(file))">
+              <q-item-label>
+                {{ file.name }}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn
+                size="12px"
+                flat
+                dense
+                round
+                color="negative"
+                icon="clear"
+                @click="remove(index)"
+              />
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-card-section>
+      <q-card-section>
+        <q-input
+          v-model="text"
+          placeholder="Сообщение"
+          filled
+          autogrow
+          clearable
+        />
+      </q-card-section>
+      <q-card-section>
+        <SearchSelect
+          v-model="codeClientId"
+          label="Клиент"
+          clearable
+          :dense="$q.screen.xs || $q.screen.sm"
+          :options="clientCodes"
+        />
+      </q-card-section>
+      <q-card-section>
+        <q-file
+          ref="input"
+          label="Выберите файлы"
+          outlined
+          multiple
+          clearable
+          max-file-size="15728640"
+          :value="files"
+          @update:model-value="selectedFiles"
+        />
+      </q-card-section>
+      <q-card-actions align="right">
+        <BaseBtn
+          :label="$t('close')"
+          color="negative"
+          icon="cancel"
+          @click-base-btn="close"
+        />
+        <BaseBtn
+          :label="$t('save')"
+          color="positive"
+          icon="save"
+          @click-base-btn="save(files)"
+        />
+      </q-card-actions>
+    </q-card>
+  </DialogComponent>
+</template>
+
+<script>
+import { getClientCodes } from "src/utils/FrequentlyCalledFunctions";
+import showNotif from "src/mixins/showNotif";
+import DialogComponent from "src/components/Dialogs/DialogComponent.vue";
+import BaseBtn from "src/components/Buttons/BaseBtn.vue";
+import SearchSelect from "src/components/Elements/SearchSelect.vue";
+import IconBtn from "src/components/Buttons/IconBtn.vue";
+import { forEach, map, isNull, startCase } from "lodash";
+import { useCodesStore } from "stores/codes";
+const codesStore = useCodesStore();
+import { useDocumentsStore } from "src/stores/documents";
+const documentsStore = useDocumentsStore();
+
+export default {
+  name: "DialogAddDocuments",
+  components: {
+    DialogComponent,
+    BaseBtn,
+    SearchSelect,
+    IconBtn,
+  },
+  mixins: [showNotif],
+  props: {
+    showDialog: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ["update:showDialog"],
+  data() {
+    return {
+      files: [],
+      extensions: ["xlsx", "txt", "doc", "docx", "pdf", "xls"],
+      codeClientId: null,
+      text: null,
+    };
+  },
+  computed: {
+    show: {
+      get: function get() {
+        return this.showDialog;
+      },
+      set: function set(val) {
+        this.$emit("update:showDialog", val);
+      },
+    },
+    clientCodes() {
+      return codesStore.getCodes;
+    },
+  },
+  created() {
+    getClientCodes(codesStore);
+  },
+  methods: {
+    selectedFiles(value) {
+      this.files = map(value, (file) => {
+        file.url = URL.createObjectURL(file);
+        return file;
+      });
+      if (isNull(value)) {
+        this.files = [];
+      }
+    },
+    getFileExt({ name }) {
+      if (name) {
+        return name.slice(name.lastIndexOf(".") + 1);
+      }
+      return name;
+    },
+    remove(index) {
+      this.files.splice(index, 1);
+    },
+    close() {
+      this.files = [];
+      this.show = false;
+    },
+    async save(files) {
+      const formData = new FormData();
+      forEach(files, (file, index) => {
+        formData.set(`img${index}`, file);
+      });
+      if (this.codeClientId) {
+        formData.set("code_client_id", this.codeClientId);
+      }
+      if (this.text) {
+        formData.set("title", startCase(this.text));
+      }
+
+      if (this.text || files.length > 0) {
+        this.$q.loading.show();
+        const { getUrl } = await import("src/tools/url");
+        this.$axios
+          .post(getUrl("storeComment"), formData)
+          .then(({ data: { comment } }) => {
+            documentsStore.addDocument(comment);
+            this.text = "";
+            this.files = [];
+            this.codeClientId = null;
+            this.$q.loading.hide();
+            this.showNotif("success", "Данные успешно сохранены", "center");
+          })
+          .catch(() => {
+            this.$q.loading.hide();
+            this.showNotif(
+              "warning",
+              "Файлы из google диска не загружаются!",
+              "center",
+            );
+            console.error("storeComment");
+          });
+      } else {
+        this.showNotif(
+          "warning",
+          "Введите сообщение или выберите файл!",
+          "center",
+        );
+      }
+    },
+  },
+};
+</script>
