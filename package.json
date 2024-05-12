@@ -21,7 +21,7 @@
     "pinia": "^2.1.7",
     "pusher-js": "^8.4.0-rc2",
     "quasar": "^2.16.2",
-    "validator": "^13.11.0",
+    "validator": "^13.12.0",
     "vue": "^3.4.27",
     "vue-i18n": "^9.13.1",
     "vue-router": "^4.3.2"
@@ -31,7 +31,7 @@
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-vue": "^9.25.0",
+    "eslint-plugin-vue": "^9.26.0",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5"
   },

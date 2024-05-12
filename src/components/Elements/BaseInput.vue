@@ -105,7 +105,7 @@ export default {
       default: () => ({}),
     },
   },
-  emits: ["update:changeValue", "input", "on-key-up"],
+  emits: ["update:changeValue", "on-key-up"],
   watch: {
     value(val) {
       if (val) {
@@ -119,8 +119,7 @@ export default {
         event.target.select();
       }
     },
-    inputEvent($event) {
-      this.$emit("input", $event);
+    inputEvent() {
       this.changeErrors();
       if (!this.changeValue) {
         this.$emit("update:changeValue", true);

@@ -37,7 +37,7 @@ export const useStorehouseStore = defineStore("storehouse", {
       this.storehouseData.unshift(entry);
     },
     updateStorehouseData(entry) {
-      const itemIndex = findIndex(state.storehouseData, { id: entry.id });
+      const itemIndex = findIndex(this.storehouseData, { id: entry.id });
       if (itemIndex !== -1) {
         this.storehouseData.splice(itemIndex, 1, entry);
       }
