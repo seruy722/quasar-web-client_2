@@ -291,6 +291,7 @@ import {
   round,
   uniq,
   uniqBy,
+  sum,
 } from "lodash";
 import { useCodesStore } from "stores/codes";
 const codesStore = useCodesStore();
@@ -505,16 +506,21 @@ export default {
       const sendData = [];
 
       forEach(values, (item) => {
-        if (!isEmpty(item.selectedPhones)) {
-          sendData.push({
-            recipients: isArray(item.selectedPhones)
-              ? item.selectedPhones
-              : toString(
-                  parseInt(item.selectedPhones.replace(/[^\d]/g, ""), 10),
-                ),
-            clientData: item,
-            text: item.text,
+        if (item.selectedPhones.length) {
+          const validatePhones = item.selectedPhones.filter((phone) => {
+            const parsedPhone = toString(
+              parseInt(phone.replace(/[^\d]/g, ""), 10),
+            );
+            return parsedPhone.length === 12;
           });
+
+          if (validatePhones.length) {
+            sendData.push({
+              recipients: validatePhones,
+              clientData: item,
+              text: item.text,
+            });
+          }
         }
       });
 

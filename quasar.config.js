@@ -50,7 +50,8 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
       env: {
-        API: ctx.dev ? "http://sp.com.ua/" : "https://server007cargo.net.ua/",
+        // API: ctx.dev ? "http://sp.com.ua/" : "https://server007cargo.net.ua/",
+        API: "https://server007cargo.net.ua/",
       },
       target: {
         browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
